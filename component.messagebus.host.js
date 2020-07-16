@@ -14,7 +14,7 @@ module.exports = {
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
             }
             if (isNaN(Number(publicport)) || isNaN(Number(privateport)) ){
-                message = "publicport is not a number";
+                message = "publicport or privateport is not a number";
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
             }
             publicport = Number(publicport);
