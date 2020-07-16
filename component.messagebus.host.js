@@ -1,13 +1,8 @@
 const utils = require("utils");
-const fs = require("fs");
 const delegate = require("component.delegate");
-
 const requestHandlerSecure = require("component.request.handler.secure");
-const requestSecure = require("component.request.secure");
-
 const logging = require("logging");
 logging.config.add("MessageBus Host");
-
 module.exports = { 
     handle: async (callingModule, { publicHost, publicPort, privateHost, privatePort }) => {
         const thisModule = `component.messagebus.host.${publicHost}.${publicPort}`;
