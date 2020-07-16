@@ -5,7 +5,13 @@ const delegate = require("component.delegate");
     delegate.register(callingModule, (callback) => {
         return { statusCode: 200, statusMessage: "Success", headers: {}, data: null };
     });
-    await messageBusHost.handle({ callingModule, port: 3000 });
+    await messageBusHost.handle({ callingModule, {
+        channel, 
+        publicHost, 
+        publicPort, 
+        privateHost, 
+        privatePort
+    });
 })().catch((err)=>{
     console.error(err);
 });
