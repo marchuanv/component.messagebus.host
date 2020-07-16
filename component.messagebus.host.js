@@ -12,7 +12,7 @@ module.exports = {
     hosts: [],
     handle: async (callingModule, { publicHost, publicPort, privateHost, privatePort }) => {
         const thisModule = `component.messagebus.host.${publicHost}.${publicPort}`;
-        delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, data } }) => {
+        delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport } }) => {
             let message = "";
             if (!passphrase){
                 message = "missing headers: passphrase, publichost and publicport";
