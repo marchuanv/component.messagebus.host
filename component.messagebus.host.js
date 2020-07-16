@@ -10,10 +10,9 @@ logging.config.add("MessageBus Host");
 
 module.exports = { 
     hosts: [],
-    handle: async (callingModule, { channel, publicHost, publicPort, privateHost, privatePort }) => {
-        const thisModule = `component.messagebus.host.${channel}`;
+    handle: async (callingModule, { publicHost, publicPort, privateHost, privatePort }) => {
+        const thisModule = `component.messagebus.host.${publicHost}.${publicPort}`;
         delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, data } }) => {
-
             let message = "";
             if (!passphrase){
                 message = "missing headers: passphrase, publichost and publicport";
@@ -27,7 +26,6 @@ module.exports = {
                     data: message
                 };
             }
-
             const exists = module.exports.hosts.find( h => h.username === username && h.publicHost === publichost && h.publicPort === publicport);
             if (exists){
                 message = "host already registered";
@@ -41,7 +39,6 @@ module.exports = {
                     data: message
                 };
             }
-
             let { hashedPassphrase, hashedPassphraseSalt } = {};
             if (passphrase){
                 ({ hashedPassphrase, hashedPassphraseSalt } = utils.hashPassphrase(passphrase));
@@ -59,12 +56,6 @@ module.exports = {
             module.exports.hosts.push(host);
             return await delegate.call(callingModule, { host });
         });
-        await requestHandlerSecure.handle(thisModule, { 
-            publicHost, 
-            publicPort,
-            privateHost,
-            privatePort,
-            path: `/${channel}/host`
-        });
+        await requestHandlerSecure.handle(thisModule, { publicHost, publicPort, privateHost, privatePort, path: `/host` });
     }
 };
