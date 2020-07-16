@@ -2,7 +2,7 @@ const messageBusHost = require("./component.messagebus.host.js");
 const delegate = require("component.delegate");
 (async()=>{ 
     const callingModule = "component.messagebus.publisher";
-    delegate.register(callingModule, () => {
+    delegate.register(callingModule, ({hosts}) => {
         return { statusCode: 200, statusMessage: "Success", headers: {}, data: null };
     });
     await messageBusHost.handle(callingModule, {
