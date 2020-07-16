@@ -5,7 +5,7 @@ const delegate = require("component.delegate");
     delegate.register(callingModule, () => {
         return { statusCode: 200, statusMessage: "Success", headers: {}, data: null };
     });
-    await messageBusHost.handle({ callingModule, {
+    await messageBusHost.handle(callingModule, {
         channel: "apples", 
         publicHost: "localhost", 
         publicPort: 3000, 
