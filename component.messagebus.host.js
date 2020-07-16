@@ -28,7 +28,7 @@ module.exports = {
             const host = { id: utils.generateGUID(), channel, username, hashedPassphrase, hashedPassphraseSalt, publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
             hosts.push(host)
             logging.write(`MessageBus Host`,`host registered`);
-            return await delegate.call(callingModule, { hosts });
+            return await delegate.call(callingModule, { host, hosts });
         });
         await requestHandlerSecure.handle(thisModule, { publicHost, publicPort, privateHost, privatePort, path: `/host` });
     }
