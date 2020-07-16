@@ -11,8 +11,8 @@ logging.config.add("MessageBusHost");
 module.exports = { 
     hosts: [],
     handle: async (callingModule, { channel, publicHost, publicPort, privateHost, privatePort }) => {
-        const thisModule = `component.messagebus.host.${channel}`;
-        delegate.register(thisModule, async ({ headers: {  username, passphrase } }) => {
+        const thisModule = `component.messagebus.host.${channel}.${publicHost}.${publicPort}`;
+        delegate.register(thisModule, async ({ headers: {  username, passphrase, data } }) => {
             let { hashedPassphrase, hashedPassphraseSalt } = {};
             if (passphrase){
                 ({ hashedPassphrase, hashedPassphraseSalt } = utils.hashPassphrase(passphrase));
@@ -34,29 +34,27 @@ module.exports = {
                     }
                 },
                 remote: {
-                    hosts: []
+                    hosts: [data]
                 },
                 publishedIds: []
             };
             logging.write(`MessageBusHost`,`Started`);
-            for(const host of module.exports.hosts){
-                for(const remoteHost of module.exports.hosts.filter(h => h.id !== host.id)){
-                    await requestSecure.send({
-                        host: remoteHost.address.public.host,
-                        port: remoteHost.address.public.port,
-                        path: `/${remoteHost.channel}/subscribe`,
-                        method: "POST",
-                        headers: {
-                            username: host.username,
-                            hashedPassphrase: remoteHost.hashedPassphrase,
-                            hashedPassphraseSalt: remoteHost.hashedPassphraseSalt,
-                            fromhost: host.address.public.host,
-                            fromport: host.address.public.port
-                        }, 
-                        data: `subscribe ${host.address.public.host}${host.address.public.port} to messages on the ${host.channel} channel`
-                    });
-                }
-            };
+            for(const remoteHost of module.exports.hosts){
+                await requestSecure.send({
+                    host: remoteHost.address.public.host,
+                    port: remoteHost.address.public.port,
+                    path: `/${remoteHost.channel}/host`,
+                    method: "POST",
+                    headers: {
+                        username: host.username,
+                        hashedPassphrase: remoteHost.hashedPassphrase,
+                        hashedPassphraseSalt: remoteHost.hashedPassphraseSalt,
+                        fromhost: host.address.public.host,
+                        fromport: host.address.public.port
+                    }, 
+                    data: JSON.stringify(host)
+                });
+            }
             await delegate.call(callingModule, { host });
             module.exports.hosts.push(host);
         });
