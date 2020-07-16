@@ -25,10 +25,10 @@ module.exports = {
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
             }
             const { hashedPassphrase, hashedPassphraseSalt } = utils.hashPassphrase(passphrase);
-            const host = { id: utils.generateGUID(), channel, username, hashedPassphrase, hashedPassphraseSalt, publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
-            hosts.push(host)
-            logging.write(`MessageBus Host`,`host registered`);
-            return await delegate.call(callingModule, { host, hosts });
+            const newHost = { id: utils.generateGUID(), channel, username, hashedPassphrase, hashedPassphraseSalt, publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
+            hosts.push(newHost)
+            logging.write(`MessageBus Host`,`new host registered`);
+            return await delegate.call(callingModule, { newHost, hosts });
         });
         await requestHandlerSecure.handle(thisModule, { publicHost, publicPort, privateHost, privatePort, path: `/host` });
     }
