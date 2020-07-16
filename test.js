@@ -1,16 +1,16 @@
 const messageBusHost = require("./component.messagebus.host.js");
 const delegate = require("component.delegate");
 (async()=>{ 
-    const callingModule = "component.messagebus";
-    delegate.register(callingModule, (callback) => {
+    const callingModule = "component.messagebus.publisher";
+    delegate.register(callingModule, () => {
         return { statusCode: 200, statusMessage: "Success", headers: {}, data: null };
     });
     await messageBusHost.handle({ callingModule, {
-        channel, 
-        publicHost, 
-        publicPort, 
-        privateHost, 
-        privatePort
+        channel: "apples", 
+        publicHost: "localhost", 
+        publicPort: 3000, 
+        privateHost: "localhost", 
+        privatePort: 3000
     });
 })().catch((err)=>{
     console.error(err);

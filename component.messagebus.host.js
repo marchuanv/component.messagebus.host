@@ -11,8 +11,8 @@ logging.config.add("MessageBusHost");
 module.exports = { 
     hosts: [],
     handle: async (callingModule, { channel, publicHost, publicPort, privateHost, privatePort }) => {
-        const thisModule = `component.messagebus.host.${channel}.${publicHost}.${publicPort}`;
-        delegate.register(thisModule, async ({ headers: {  username, passphrase, data } }) => {
+        const thisModule = `component.messagebus.host.${channel}`;
+        delegate.register(thisModule, async ({ headers: {  username, passphrase, publicHost, publicPort, data } }) => {
             let { hashedPassphrase, hashedPassphraseSalt } = {};
             if (passphrase){
                 ({ hashedPassphrase, hashedPassphraseSalt } = utils.hashPassphrase(passphrase));
@@ -23,34 +23,25 @@ module.exports = {
                 username,
                 hashedPassphrase,
                 hashedPassphraseSalt,
-                address: {
-                    private: {
-                        host: privateHost,
-                        port: privatePort
-                    },
-                    public: {
-                        host: publicHost,
-                        port: publicPort
-                    }
-                },
+                publicHost,
+                publicPort,
                 remote: {
                     hosts: [data]
-                },
-                publishedIds: []
+                }
             };
-            logging.write(`MessageBusHost`,`Started`);
+            logging.write(`MessageBusHost`,`registered`);
             for(const remoteHost of module.exports.hosts){
                 await requestSecure.send({
-                    host: remoteHost.address.public.host,
-                    port: remoteHost.address.public.port,
+                    host: remoteHost.publicHost,
+                    port: remoteHost.publicPort,
                     path: `/${remoteHost.channel}/host`,
                     method: "POST",
                     headers: {
                         username: host.username,
                         hashedPassphrase: remoteHost.hashedPassphrase,
                         hashedPassphraseSalt: remoteHost.hashedPassphraseSalt,
-                        fromhost: host.address.public.host,
-                        fromport: host.address.public.port
+                        fromhost: host.publicHost,
+                        fromport: host.publicPort
                     }, 
                     data: JSON.stringify(host)
                 });

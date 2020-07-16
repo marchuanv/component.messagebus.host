@@ -25,6 +25,5 @@
     "component.request.handler.secure": "git+https://github.com/marchuanv/component.request.handler.secure.git",
     "component.request.secure": "git+https://github.com/marchuanv/component.request.secure.git",
     "component.delegate": "git+https://github.com/marchuanv/component.delegate.git"
-
   }
 }
