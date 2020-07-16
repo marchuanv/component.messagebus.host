@@ -13,11 +13,12 @@ module.exports = {
                 message = "missing headers: passphrase, publichost, publicport, privatehost, privateport and channel";
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
             }
-            if (isNaN(Number(publicport))){
+            if (isNaN(Number(publicport)) || isNaN(Number(privateport)) ){
                 message = "publicport is not a number";
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
             }
             publicport = Number(publicport);
+            privateport = Number(privateport);
             const exists = hosts.find( h => h.username === username && h.publicHost === publichost && h.publicPort === publicport);
             if (exists){
                 message = "host already registered";
