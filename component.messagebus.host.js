@@ -7,10 +7,10 @@ module.exports = {
     handle: async (callingModule, { publicHost, publicPort, privateHost, privatePort }) => {
         const thisModule = `component.messagebus.host.${publicHost}.${publicPort}`;
         const hosts = [];
-        delegate.register(thisModule, async ({ headers: {  username, passphrase, channel, publichost, publicport, privatehost, privateport } }) => {
+        delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, privatehost, privateport } }) => {
             let message = "";
-            if (!passphrase || !publichost || !publicport || !channel || !privatehost || !privateport){
-                message = "missing headers: passphrase, publichost, publicport, privatehost, privateport and channel";
+            if ( !publichost || !publicport || !privatehost || !privateport){
+                message = "required http headers: publichost, publicport, privatehost and privateport";
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
             }
             if (isNaN(Number(publicport)) || isNaN(Number(privateport)) ){
@@ -24,10 +24,15 @@ module.exports = {
                 message = "host already registered";
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
             }
-            const { hashedPassphrase, hashedPassphraseSalt } = utils.hashPassphrase(passphrase);
-            const newHost = { id: utils.generateGUID(), channel, username, hashedPassphrase, hashedPassphraseSalt, publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
-            hosts.push(newHost)
+            let newHost;
+            if (passphrase){
+                const { hashedPassphrase, hashedPassphraseSalt } = utils.hashPassphrase(passphrase);
+                newHost = { id: utils.generateGUID(), username, hashedPassphrase, hashedPassphraseSalt, publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
+            } else {
+                newHost = { id: utils.generateGUID(), username, publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
+            }
             logging.write(`MessageBus Host`,`new host registered`);
+            hosts.push(newHost)
             return await delegate.call(callingModule, { newHost, hosts });
         });
         await requestHandlerSecure.handle(thisModule, { publicHost, publicPort, privateHost, privatePort, path: `/host` });
