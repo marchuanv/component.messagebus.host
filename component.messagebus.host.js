@@ -6,6 +6,10 @@ logging.config.add("MessageBus Host");
 module.exports = {
     hosts: [],
     handle: async (callingModule, options) => {
+        
+        const clonedOptions = JSON.parse(Json.stringify(options));
+        clonedOptions.path = "/host";
+
         const thisModule = `component.messagebus.host.${publicHost}.${publicPort}`;
         const hosts = [];
         delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, privatehost, privateport } }) => {
@@ -36,7 +40,7 @@ module.exports = {
             module.exports.hosts.push(newHost)
             return await delegate.call(callingModule, { hosts: module.exports.hosts });
         });
-        options.path = "/host";
-        await requestHandlerSecure.handle(thisModule, options);
+       
+        await requestHandlerSecure.handle(thisModule, clonedOptions);
     }
 };
