@@ -3,7 +3,8 @@ const delegate = require("component.delegate");
 const requestHandlerSecure = require("component.request.handler.secure");
 const logging = require("logging");
 logging.config.add("MessageBus Host");
-module.exports = { 
+module.exports = {
+    hosts: [],
     handle: async (callingModule, { publicHost, publicPort, privateHost, privatePort }) => {
         const thisModule = `component.messagebus.host.${publicHost}.${publicPort}`;
         const hosts = [];
@@ -32,9 +33,9 @@ module.exports = {
                 newHost = { id: utils.generateGUID(), username, publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
             }
             logging.write(`MessageBus Host`,`new host registered`);
-            hosts.push(newHost)
-            return await delegate.call(callingModule, { newHost, hosts });
+            module.exports.hosts.push(newHost)
+            return await delegate.call(callingModule, { hosts: module.exports.hosts });
         });
-        await requestHandlerSecure.handle(thisModule, { publicHost, publicPort, privateHost, privatePort, path: `/host` });
+        await requestHandlerSecure.handle(thisModule, { publicHost, publicPort, privateHost, privatePort, path: "/host" });
     }
 };

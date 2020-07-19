@@ -1,7 +1,7 @@
 {
   "name": "component.messagebus.host",
   "version": "1.0.0",
-  "description": "module for setting up a messagebus host",
+  "description": "module for configuring and hosting a messagebus",
   "main": "component.messagebus.host.js",
   "engines": {
     "node": "12.16.1",
