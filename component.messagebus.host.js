@@ -7,10 +7,10 @@ module.exports = {
     hosts: [],
     handle: async (callingModule, options) => {
         
-        const clonedOptions = JSON.parse(Json.stringify(options));
+        const clonedOptions = JSON.parse(JSON.stringify(options));
         clonedOptions.path = "/host";
 
-        const thisModule = `component.messagebus.host.${publicHost}.${publicPort}`;
+        const thisModule = `component.messagebus.host.${options.publicHost}.${options.publicPort}`;
         const hosts = [];
         delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, privatehost, privateport } }) => {
             let message = "";
