@@ -10,7 +10,7 @@ module.exports = {
         const clonedOptions = JSON.parse(JSON.stringify(options));
         clonedOptions.path = "/host";
 
-        const thisModule = `component.messagebus.host.${options.publicHost}.${options.publicPort}`;
+        const thisModule = `component.messagebus.host.${clonedOptions.publicHost}.${clonedOptions.publicPort}`;
         const hosts = [];
         delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, privatehost, privateport } }) => {
             let message = "";
