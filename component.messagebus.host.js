@@ -31,6 +31,7 @@ module.exports = {
             }
             logging.write(`MessageBus Host`,`new host created`);
             await delegate.call(callingModule, { host: newHost });
+            const statusMessage = "Success";
             return {
                 headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(statusMessage) },
                 statusCode: 200,
