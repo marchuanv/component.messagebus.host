@@ -6,12 +6,9 @@ logging.config.add("MessageBus Host");
 module.exports = {
     hosts: [],
     handle: async (callingModule, options) => {
-        
         const clonedOptions = JSON.parse(JSON.stringify(options));
         clonedOptions.path = "/host";
-
         const thisModule = `component.messagebus.host.${clonedOptions.publicHost}.${clonedOptions.publicPort}`;
-        const hosts = [];
         delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, privatehost, privateport } }) => {
             let message = "";
             if ( !publichost || !publicport || !privatehost || !privateport){
@@ -24,7 +21,7 @@ module.exports = {
             }
             publicport = Number(publicport);
             privateport = Number(privateport);
-            const exists = hosts.find( h => h.username === username && h.publicHost === publichost && h.publicPort === publicport);
+            const exists = module.exports.hosts.find( h => h.username === username && h.publicHost === publichost && h.publicPort === publicport);
             if (exists){
                 message = "host already registered";
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
@@ -38,9 +35,14 @@ module.exports = {
             }
             logging.write(`MessageBus Host`,`new host registered`);
             module.exports.hosts.push(newHost)
-            return await delegate.call(callingModule, { hosts: module.exports.hosts });
+            await delegate.call(callingModule, { hosts: module.exports.hosts });
+            return {
+                headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(statusMessage) },
+                statusCode: 200,
+                statusMessage: "Success",
+                data: `${newHost.name} created.`
+            };
         });
-       
         await requestHandlerSecure.handle(thisModule, clonedOptions);
     }
 };
