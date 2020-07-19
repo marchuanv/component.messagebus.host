@@ -21,11 +21,7 @@ module.exports = {
             }
             publicport = Number(publicport);
             privateport = Number(privateport);
-            const exists = module.exports.hosts.find( h => h.username === username && h.publicHost === publichost && h.publicPort === publicport);
-            if (exists){
-                message = "host already registered";
-                return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
-            }
+          
             let newHost;
             if (passphrase){
                 const { hashedPassphrase, hashedPassphraseSalt } = utils.hashPassphrase(passphrase);
@@ -33,9 +29,8 @@ module.exports = {
             } else {
                 newHost = { id: utils.generateGUID(), username, publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
             }
-            logging.write(`MessageBus Host`,`new host registered`);
-            module.exports.hosts.push(newHost)
-            await delegate.call(callingModule, { hosts: module.exports.hosts });
+            logging.write(`MessageBus Host`,`new host created`);
+            await delegate.call(callingModule, { host: newHost });
             return {
                 headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(statusMessage) },
                 statusCode: 200,
