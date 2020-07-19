@@ -5,7 +5,7 @@ const logging = require("logging");
 logging.config.add("MessageBus Host");
 module.exports = {
     hosts: [],
-    handle: async (callingModule, { publicHost, publicPort, privateHost, privatePort }) => {
+    handle: async (callingModule, options) => {
         const thisModule = `component.messagebus.host.${publicHost}.${publicPort}`;
         const hosts = [];
         delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, privatehost, privateport } }) => {
@@ -36,6 +36,7 @@ module.exports = {
             module.exports.hosts.push(newHost)
             return await delegate.call(callingModule, { hosts: module.exports.hosts });
         });
-        await requestHandlerSecure.handle(thisModule, { publicHost, publicPort, privateHost, privatePort, path: "/host" });
+        options.path = "/host";
+        await requestHandlerSecure.handle(thisModule, options);
     }
 };
