@@ -9,10 +9,11 @@ module.exports = {
         const clonedOptions = JSON.parse(JSON.stringify(options));
         clonedOptions.path = "/host";
         const thisModule = `component.messagebus.host.${clonedOptions.publicHost}.${clonedOptions.publicPort}`;
-        delegate.register(thisModule, async ({ headers: {  username, passphrase, publichost, publicport, privatehost, privateport } }) => {
+        delegate.register(thisModule, async ({ headers: {  username, passphrase }, data }) => {
             let message = "";
+            let { publichost, publicport, privatehost, privateport } = utils.getJSONObject(data) || {};
             if ( !publichost || !publicport || !privatehost || !privateport){
-                message = "required http headers: publichost, publicport, privatehost and privateport";
+                message = "publichost, publicport, privatehost and privateport is required to create a host";
                 return { headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) }, statusCode: 400, statusMessage: "Bad Request", data: message };
             }
             if (isNaN(Number(publicport)) || isNaN(Number(privateport)) ){
@@ -31,12 +32,12 @@ module.exports = {
             }
             logging.write(`MessageBus Host`,`new host created`);
             await delegate.call(callingModule, { host: newHost });
-            const statusMessage = "Success";
+            const response = `${newHost.publicHost} created.`;
             return {
-                headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(statusMessage) },
+                headers: { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(response) },
                 statusCode: 200,
                 statusMessage: "Success",
-                data: `${newHost.name} created.`
+                data: response
             };
         });
         await requestHandlerSecure.handle(thisModule, clonedOptions);
