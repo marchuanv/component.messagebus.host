@@ -4,7 +4,6 @@ const requestHandlerSecure = require("component.request.handler.secure");
 const logging = require("logging");
 logging.config.add("MessageBus Host");
 module.exports = {
-    hosts: [],
     handle: async (options) => {
         const clonedOptions = JSON.parse(JSON.stringify(options));
         clonedOptions.path = "/host";
@@ -33,7 +32,7 @@ module.exports = {
                 newHost = { id: utils.generateGUID(), publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
             }
             logging.write(`MessageBus Host`,`new host created`);
-            await delegate.call( { context: "component.messagebus.host.channel", name }, { host: newHost });
+            await delegate.call( { context: "component.messagebus.host.channel", name: `${options.publicPort}/channel` }, { host: newHost });
             const response = `${newHost.publicHost} created.`;
             return {
                 headers,
