@@ -8,8 +8,9 @@ module.exports = {
     handle: async (callingModule, options) => {
         const clonedOptions = JSON.parse(JSON.stringify(options));
         clonedOptions.path = "/host";
-        const thisModule = `component.messagebus.host.${clonedOptions.publicHost}.${clonedOptions.publicPort}`;
-        delegate.register(thisModule, async ({ headers, data }) => {
+        const thisModule = `component.messagebus.host`;
+        const name = `${options.publicPort}/host`;
+        delegate.register(thisModule, name, async ({ headers, data }) => {
             let message = "";
             let { publichost, publicport, privatehost, privateport } = utils.getJSONObject(data) || {};
             let { passphrase } = headers;
@@ -32,7 +33,7 @@ module.exports = {
                 newHost = { id: utils.generateGUID(), publicHost: publichost, publicPort: publicport,  privateHost: privatehost, privatePort: privateport };
             }
             logging.write(`MessageBus Host`,`new host created`);
-            await delegate.call(callingModule, { host: newHost });
+            await delegate.call( { context: callingModule, name }, { host: newHost });
             const response = `${newHost.publicHost} created.`;
             return {
                 headers,
