@@ -26,13 +26,13 @@ module.exports = {
             let newHost;
             if (passphrase){
                 const { hashedPassphrase, hashedPassphraseSalt } = utils.hashPassphrase(passphrase);
-                newHost = { id: utils.generateGUID(), hashedPassphrase, hashedPassphraseSalt, host, port };
+                newHost = { id: utils.generateGUID(), hashedPassphrase, hashedPassphraseSalt, name: host, port };
             } else {
-                newHost = { id: utils.generateGUID(), host, port };
+                newHost = { id: utils.generateGUID(), name: host, port };
             }
             logging.write(`MessageBus Host`,`new host created`);
             await delegate.call( { context: "component.messagebus.host.channel", name: `${options.port}/channel` }, { host: newHost });
-            const response = `${newHost.host} created.`;
+            const response = `new ${newHost.name} host created.`;
             return {
                 headers,
                 statusCode: 200,

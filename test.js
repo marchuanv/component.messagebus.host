@@ -29,24 +29,9 @@ const request = require("component.request");
     if (results.statusCode !== 200){
         throw "New Request To Register New Host Test Failed";
     }
-    //New Request To Registered Secured Host
-    results = await request.send({
-        host: "localhost",
-        port: 6000,
-        path: "/newhost",
-        method: "GET",
-        headers: { 
-            username: "marchuanv",
-            fromhost: "localhost",
-            fromport: 6000,
-            passphrase: "secure1"
-        }, 
-        data: "",
-        retryCount: 1
-    });
-    if (results.statusCode !== 200){
-        throw "New Request To Registered Host Test Failed";
-    }
+
+    process.exit();
+   
 })().catch((err)=>{
     console.error(err);
 });
