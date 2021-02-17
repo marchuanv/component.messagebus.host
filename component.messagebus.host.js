@@ -31,7 +31,7 @@ module.exports = {
                 newHost = { id: utils.generateGUID(), host, port };
             }
             logging.write(`MessageBus Host`,`new host created`);
-            await delegate.call( { context: "component.messagebus.host.channel", name: `${options.port}/channel` }, { host: newHost.host });
+            await delegate.call( { context: "component.messagebus.host.channel", name: `${options.port}/channel` }, { host: newHost });
             const response = `${newHost.host} created.`;
             return {
                 headers,
