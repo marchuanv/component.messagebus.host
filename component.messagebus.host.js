@@ -40,6 +40,6 @@ module.exports = {
                 data: response
             };
         });
-        const results = await requestHandlerSecure.handle(context, clonedOptions);
+        await requestHandlerSecure.handle(context, clonedOptions);
     }
 };
