@@ -2,14 +2,11 @@ const utils = require("utils");
 const delegate = require("component.delegate");
 const requestHandlerUnsecure = require("component.request.handler.unsecure");
 const logging = require("logging");
-const config = require("./config.json");
 logging.config.add("MessageBus Host");
 
 module.exports = {
     handle: async () => {
-        if (process.env.PORT){
-            config.host.port = process.env.PORT;
-        }
+        const config = await module.exports.config();
         delegate.register("component.messagebus.host", `${config.host.port}${config.host.path}`, async ({ headers, data }) => {
             let message = "";
             let { host, port } = utils.getJSONObject(data) || {};
@@ -35,5 +32,12 @@ module.exports = {
             return await delegate.call( { context: "component.messagebus.host.channel", name: `${config.host.port}${config.host.path}` }, newHost );
         });
         await requestHandlerUnsecure.handle("component.messagebus.host", config.host);
+    },
+    config: async () => {
+        const config = require("./config.json");
+        if (process.env.PORT){
+            config.host.port = process.env.PORT;
+        }
+        return config;
     }
 };

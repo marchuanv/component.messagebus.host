@@ -1,13 +1,10 @@
 const messageBusHost = require("./component.messagebus.host.js");
 const delegate = require("component.delegate");
 const unsecureRequest = require("component.request.unsecure");
-const config = require("./config.json");
 const utils = require("utils");
 
 (async() => { 
-    if (process.env.PORT){
-        config.host.port = process.env.PORT;
-    }
+    const config = await messageBusHost.config();
     const newHostRequest = { host: "localhost", port: 6000 };
     delegate.register("component.messagebus.host.channel", `${config.host.port}${config.host.path}`, ({ name, port }) => {
         return { statusCode: 200, statusMessage: "Success", headers: {}, data: `notified of host started on ${name}:${port}` };
