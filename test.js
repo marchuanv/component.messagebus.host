@@ -1,33 +1,32 @@
 const messageBusHost = require("./component.messagebus.host.js");
 const delegate = require("component.delegate");
-const request = require("component.request");
-(async()=>{ 
-    const callingModule = "component.messagebus.publisher";
-    delegate.register(callingModule, ({hosts}) => {
-        return { statusCode: 200, statusMessage: "Success", headers: {}, data: null };
+const unsecureRequest = require("component.request.unsecure");
+const config = require("./config.json");
+const utils = require("utils");
+
+(async() => { 
+    if (process.env.PORT){
+        config.host.port = process.env.PORT;
+    }
+    const newHostRequest = { host: "localhost", port: 6000 };
+    delegate.register("component.messagebus.host.channel", `${config.host.port}${config.host.path}`, ({ name, port }) => {
+        return { statusCode: 200, statusMessage: "Success", headers: {}, data: `notified of host started on ${name}:${port}` };
     });
-    await messageBusHost.handle({
-        channel: "apples", 
-        host: "localhost", 
-        port: 3000
-    });
-    //Register New Host
-    let results = await request.send({ 
-        host: "localhost",
-        port: 3000,
-        path: "/host",
+    await messageBusHost.handle();
+
+    //Unsecure Request To Register New Host
+    let results = await unsecureRequest.send({ 
+        host: config.host.name,
+        port: config.host.port,
+        path: config.host.path,
         method: "GET",
-        headers: { 
-            username: "marchuanv",
-            fromhost: "localhost",
-            fromport: 6000,
-            passphrase: "secure1"
-        }, 
-        data: `{ "host": "localhost", "port": "6000" }`,
-        retryCount: 1
+        username: "marchuanv",
+        fromhost: "localhost",
+        fromport: 6000,
+        data: utils.getJSONString(newHostRequest)
     });
-    if (results.statusCode !== 200){
-        throw "New Request To Register New Host Test Failed";
+    if (results.statusCode !== 200 && results.statusMessage !== `notified of host started on ${newHostRequest.host}:${newHostRequest.port}`){
+        throw "Unsecure Request To Register New Host Test Failed";
     }
 
     process.exit();

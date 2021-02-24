@@ -1,15 +1,16 @@
 const utils = require("utils");
 const delegate = require("component.delegate");
-const requestHandlerSecure = require("component.request.handler.secure");
+const requestHandlerUnsecure = require("component.request.handler.unsecure");
 const logging = require("logging");
+const config = require("./config.json");
 logging.config.add("MessageBus Host");
+
 module.exports = {
-    handle: async (options) => {
-        const clonedOptions = JSON.parse(JSON.stringify(options));
-        clonedOptions.path = "/host";
-        const context = `component.messagebus.host`;
-        const name = `${options.port}/host`;
-        delegate.register(context, name, async ({ headers, data }) => {
+    handle: async () => {
+        if (process.env.PORT){
+            config.host.port = process.env.PORT;
+        }
+        delegate.register("component.messagebus.host", `${config.host.port}${config.host.path}`, async ({ headers, data }) => {
             let message = "";
             let { host, port } = utils.getJSONObject(data) || {};
             let { passphrase } = headers;
@@ -31,8 +32,8 @@ module.exports = {
                 newHost = { id: utils.generateGUID(), name: host, port };
             }
             logging.write(`MessageBus Host`,`new host created`);
-            return await delegate.call( { context: "component.messagebus.host.channel", name: options.port.toString() }, { host: newHost });
+            return await delegate.call( { context: "component.messagebus.host.channel", name: `${config.host.port}${config.host.path}` }, newHost );
         });
-        await requestHandlerSecure.handle(context, clonedOptions);
+        await requestHandlerUnsecure.handle("component.messagebus.host", config.host);
     }
 };
